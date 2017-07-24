@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
@@ -12,33 +13,10 @@ namespace JsonManipulator
     {
         private List<User> _friendsList;
 
-        public string FirstName { get; set; }
-
-        public string LastName { get; set; }
-
-        public int Index { get; set; }
-
+        [JsonProperty(nameof(Id))]
         public string Id { get; set; }
 
-        public HashSet<int> FriendsIndexs { get; set; }
-
-        public bool Verified { get; set; }
-
-        public int Groups { get; set; }
-
-        [JsonConverter(typeof(StringEnumConverter))]
-        public Gender Gender { get; set; }
-
-        public int PostsNumber { get; set; }
-
-        public DateTime CreationDate { get; set; }
-
         public int Age { get; set; }
-
-        public Address Address { get; set; }
-
-        [JsonIgnore]
-        public int NumberOfFriends { get; private set; }
 
         [JsonIgnore]
         public List<User> FriendsList
@@ -50,6 +28,39 @@ namespace JsonManipulator
                 NumberOfFriends = value.Count;
             }
         }
+
+        [JsonProperty(nameof(Verified))]
+        public bool Verified { get; set; }
+
+        [JsonProperty(nameof(Groups))]
+        public int Groups { get; set; }
+
+
+        //[JsonProperty(nameof(FriendsIndexs))]
+        [JsonProperty("FriendsIds")]
+        public List<int> FriendsIndexs { get; set; }
+
+        [JsonIgnore]
+        public int NumberOfFriends { get; set; }
+
+        public string Gender { get; set; }
+
+        public Address Address { get; set; }
+
+        [JsonProperty(nameof(PostsNumber))]
+        public int PostsNumber { get; set; }
+
+        [JsonProperty(nameof(CreationDate))]
+        public DateTime CreationDate { get; set; }
+
+        public User()
+        {
+            FriendsList = new List<User>();
+            //
+        }
+
+        [JsonProperty("Index")]
+        public int Index { get; set; }
 
         public bool Equals(User other)
         {

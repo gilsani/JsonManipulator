@@ -36,6 +36,15 @@ namespace JsonManipulator
             }
         }
 
+        private void SaveFileDialog(EventHandler<ServiceResult<string>> callback)
+        {
+            var openFileDialog = new SaveFileDialog();
+            if (openFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                callback.Invoke(this, new ServiceResult<string>(openFileDialog.FileName));
+            }
+        }
+
         private IEnumerable<User> ReadUsersFromPath(string path)
         {
             try
@@ -83,16 +92,16 @@ namespace JsonManipulator
             }
         }
 
-        private List<List<int>> BuildAdjacencyMatrix(List<User> users)
+        private int[][] BuildAdjacencyMatrix(List<User> users)
         {
             var n = users.Count;
             var vertices = users;
-            var adjacency = new List<List<int>>();
+            var adjacency = new int[n][];
             for (var index = 0; index < n; index++)
-                adjacency[index] = new List<int>();
+                adjacency[index] = new int[n];
             foreach (var v1 in vertices)
                 foreach (var v2 in vertices)
-                    if (adjacency[v1.Index][v2.Index] == 1 && v1.FriendsIndexs.Contains(v2.Index))
+                    if (adjacency[v1.Index][v2.Index] == 0 && v1.FriendsIndexs.Contains(v2.Index))
                     {
                         numberOfEdges++;
                         adjacency[v1.Index][v2.Index] = 1;
@@ -116,7 +125,14 @@ namespace JsonManipulator
                 do
                 {
                     var randomNumber = 100 * i + random.Next(0, 100);
-                    var neighbor = adjMatrix[randomNumber].First(i1 => adjMatrix[randomNumber][i1] == 1 && i1/100 == i);
+                    var neighbor = 0;
+                    for (var j = 0; j < users.Count; j++)
+                    {
+                        if (adjMatrix[randomNumber][j] == 1 && j / 100 == i)
+                        {
+                            neighbor = j;
+                        }
+                    }
                     adjMatrix[randomNumber][neighbor] = 0;
                     adjMatrix[neighbor][randomNumber] = 0;
 
@@ -146,7 +162,7 @@ namespace JsonManipulator
             }
 
             foreach (var v1 in users)
-                v1.FriendsIndexs = new HashSet<int>();
+                v1.FriendsIndexs = new List<int>();
 
             foreach (var v1 in users)
                 foreach (var v2 in users)
@@ -159,6 +175,7 @@ namespace JsonManipulator
             var json = JsonConvert.SerializeObject(users, Formatting.Indented);
             File.WriteAllText(targetPath, json);
 
+            MessageBox.Show("Finished");
         }
 
         private void LoadTextBox_MouseClick(object sender, MouseEventArgs e)
@@ -174,7 +191,7 @@ namespace JsonManipulator
 
         private void TargetDirTextBox_MouseClick(object sender, MouseEventArgs e)
         {
-            OpenFileDialog((o, result) =>
+            SaveFileDialog((o, result) =>
             {
                 var path = result.Object;
                 textBox1.Text = path;
