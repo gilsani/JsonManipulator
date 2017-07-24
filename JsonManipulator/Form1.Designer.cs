@@ -163,7 +163,7 @@ namespace JsonManipulator
             this.Controls.Add(this.textBox1);
             this.Controls.Add(this.PercentComboBox);
             this.Name = "Form1";
-            this.Text = "Form1";
+            this.Text = "JsonManipulator";
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             this.ResumeLayout(false);
