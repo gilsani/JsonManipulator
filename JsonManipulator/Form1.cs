@@ -186,8 +186,19 @@ namespace JsonManipulator
             {
                 var path = result.Object;
                 textBox2.Text = path;
-                var temp = await Task.Run(() => ReadUsersFromPath(path));
-                users = temp.ToList();      
+                var temp = await Task.Run(() =>
+                {
+                    try
+                    {
+                        return ReadUsersFromPath(path);
+                    }
+                    catch (IncorrectUsersFileException exception)
+                    {
+                        MessageBox.Show(exception.Message);
+                    }
+                    return null;
+                });
+                users = temp?.ToList();      
             });
         }
 

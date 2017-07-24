@@ -8,5 +8,9 @@ namespace JsonManipulator
 {
     public class IncorrectUsersFileException : Exception
     {
+        public IncorrectUsersFileException() : base("IncorrectUsersFileException")
+        {
+            
+        }
     }
 }
