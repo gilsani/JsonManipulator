@@ -113,11 +113,11 @@ namespace JsonManipulator
 
         private async void BtnScrumble_Click(object sender, EventArgs e)
         {
-            int.TryParse(PercentComboBox.SelectedText.Replace("%", ""), out int percent);
+            int.TryParse(((string)PercentComboBox.SelectedItem).Replace("%", ""), out int percent);
             var adjMatrix = await Task.Run(() => BuildAdjacencyMatrix(users));
             await Task.Run(() =>
             {
-                var ets = (numberOfEdges * (percent / 100)) / numberOfClusters;
+                var ets = (int)((numberOfEdges * (percent / 100.0)) / numberOfClusters);
                 var random = new Random();
 
                 for (var i = 0; i < numberOfClusters; i++)
