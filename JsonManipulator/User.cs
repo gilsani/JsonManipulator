@@ -38,7 +38,7 @@ namespace JsonManipulator
 
         //[JsonProperty(nameof(FriendsIndexs))]
         [JsonProperty("FriendsIds")]
-        public List<int> FriendsIndexs { get; set; }
+        public HashSet<int> FriendsIndexs { get; set; }
 
         [JsonIgnore]
         public int NumberOfFriends { get; set; }

@@ -162,7 +162,7 @@ namespace JsonManipulator
             }
 
             foreach (var v1 in users)
-                v1.FriendsIndexs = new List<int>();
+                v1.FriendsIndexs = new HashSet<int>();
 
             foreach (var v1 in users)
                 foreach (var v2 in users)
