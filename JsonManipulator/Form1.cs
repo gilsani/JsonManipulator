@@ -14,7 +14,7 @@ namespace JsonManipulator
 {
     public partial class Form1 : Form
     {
-        private int numberOfClusters;
+        private int numberOfClusters = 2;
         private string targetPath;
         private List<User> users;
         private int numberOfEdges;
@@ -38,7 +38,7 @@ namespace JsonManipulator
 
         private void SaveFileDialog(EventHandler<ServiceResult<string>> callback)
         {
-            var openFileDialog = new SaveFileDialog();
+            var openFileDialog = new SaveFileDialog {FileName = "users", DefaultExt = ".json"};
             if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
                 callback.Invoke(this, new ServiceResult<string>(openFileDialog.FileName));
@@ -115,56 +115,57 @@ namespace JsonManipulator
         {
             int.TryParse(PercentComboBox.SelectedText.Replace("%", ""), out int percent);
             var adjMatrix = await Task.Run(() => BuildAdjacencyMatrix(users));
-
-            var ets = (numberOfEdges * (percent / 100)) / numberOfClusters;
-            var random = new Random();
-
-            for (var i = 0; i < numberOfClusters; i++)
+            await Task.Run(() =>
             {
-                var nets = ets;
-                do
+                var ets = (numberOfEdges * (percent / 100)) / numberOfClusters;
+                var random = new Random();
+
+                for (var i = 0; i < numberOfClusters; i++)
                 {
-                    var randomNumber = 100 * i + random.Next(0, 100);
-                    var neighbor = 0;
-                    for (var j = 0; j < users.Count; j++)
+                    var nets = ets;
+                    do
                     {
-                        if (adjMatrix[randomNumber][j] == 1 && j / 100 == i)
+                        var randomNumber = 100 * i + random.Next(0, 100);
+                        var neighbor = 0;
+                        for (var j = 0; j < users.Count; j++)
                         {
-                            neighbor = j;
+                            if (adjMatrix[randomNumber][j] == 1 && j / 100 == i)
+                            {
+                                neighbor = j;
+                            }
                         }
-                    }
-                    adjMatrix[randomNumber][neighbor] = 0;
-                    adjMatrix[neighbor][randomNumber] = 0;
+                        adjMatrix[randomNumber][neighbor] = 0;
+                        adjMatrix[neighbor][randomNumber] = 0;
 
-                    int oc1 = 0, oc2 = 0;
-                    
-                    if (numberOfClusters == 2)
-                    {
-                        oc1 = oc2 = (i + 1) % 2;
+                        int oc1 = 0, oc2 = 0;
 
-                    }
-                    else if (numberOfClusters == 3)
-                    {
-                        oc1 = (i + 1) % 3;
-                        oc2 = (i + 2) % 3;
+                        if (numberOfClusters == 2)
+                        {
+                            oc1 = oc2 = (i + 1) % 2;
 
-                    }
+                        }
+                        else if (numberOfClusters == 3)
+                        {
+                            oc1 = (i + 1) % 3;
+                            oc2 = (i + 2) % 3;
 
-                    var randomVertex1 = 100 * oc1 + random.Next(0, 100);
-                    var randomVertex2 = 100 * oc2 + random.Next(0, 100);
+                        }
 
-                    adjMatrix[randomVertex1][randomNumber] = 1;
-                    adjMatrix[randomNumber][randomVertex1] = 1;
-                    adjMatrix[randomVertex2][neighbor] = 1;
-                    adjMatrix[neighbor][randomVertex2] = 1;
-                    nets--;
-                } while (nets > 0);
-            }
+                        var randomVertex1 = 100 * oc1 + random.Next(0, 100);
+                        var randomVertex2 = 100 * oc2 + random.Next(0, 100);
 
-            foreach (var v1 in users)
-                v1.FriendsIndexs = new HashSet<int>();
+                        adjMatrix[randomVertex1][randomNumber] = 1;
+                        adjMatrix[randomNumber][randomVertex1] = 1;
+                        adjMatrix[randomVertex2][neighbor] = 1;
+                        adjMatrix[neighbor][randomVertex2] = 1;
+                        nets--;
+                    } while (nets > 0);
+                }
 
-            foreach (var v1 in users)
+                foreach (var v1 in users)
+                    v1.FriendsIndexs = new HashSet<int>();
+
+                foreach (var v1 in users)
                 foreach (var v2 in users)
                     if (adjMatrix[v1.Index][v2.Index] == 1)
                     {
@@ -172,8 +173,9 @@ namespace JsonManipulator
                         v2.FriendsIndexs.Add(v1.Index);
                     }
 
-            var json = JsonConvert.SerializeObject(users, Formatting.Indented);
-            File.WriteAllText(targetPath, json);
+                var json = JsonConvert.SerializeObject(users, Formatting.Indented);
+                File.WriteAllText(targetPath, json);
+            });
 
             MessageBox.Show("Finished");
         }
